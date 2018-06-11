@@ -21,6 +21,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     private ArrayAdapter<String> mAdapter;
 
     private ArrayList<String> mData = new ArrayList<>();
+    private ArrayList<String> mData2 = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,7 +82,13 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 @Override
                 public void run() {
 
-                    mData.add("这是刷新数据");
+                    for (int i = 0; i < 5; i++) {
+                        mData2.add("这是第"+i+"条刷新数据");
+                    }
+
+
+                    mData.addAll(0,mData2);
+
                     mAdapter.notifyDataSetChanged();
                     swipeRefreshView.setRefreshing(false);
                 }
