@@ -26,6 +26,7 @@ public class SwipeRefreshView extends SwipeRefreshLayout {
     private final View mFooterView;
     private ListView mListView;
     private OnLoadListener mOnLoadListener;
+    private float mTotalDragDistance = -1;//总阻力的距离
     /**
      * 正在加载状态
      */
@@ -65,27 +66,26 @@ public class SwipeRefreshView extends SwipeRefreshLayout {
      * @param ev
      * @return
      */
-    private float mDownY, mUpY,mMoveY;
+    private float mDownY, mUpY;
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         switch (ev.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 // 移动的起点
-                mDownY = ev.getY();
+                mDownY = ev.getRawY();
                 Log.i("zkk","ACTION_DOWN");
                 break;
             case MotionEvent.ACTION_MOVE:
-                mUpY = ev.getY();
-                // 移动过程中判断时候能下拉加载更多
+                mUpY = ev.getRawY();
+                break;
+            case MotionEvent.ACTION_UP:
+                // 移动的终点
+                // 判断时候能下拉加载更多
                 if (canLoadMore()) {
                     // 加载数据
                     loadData();
                 }
-                break;
-            case MotionEvent.ACTION_UP:
-                // 移动的终点
-                //mUpY = getY();
                 Log.i("zkk","ACTION_UP");
                 break;
         }
@@ -97,12 +97,13 @@ public class SwipeRefreshView extends SwipeRefreshLayout {
      * @return
      */
     private boolean canLoadMore() {
+        mTotalDragDistance = 300;
         // 1. 是上拉状态
-//        boolean condition1 = (mDownY - mUpY) >= mScaledTouchSlop;
-//        Log.i("zkk","mDownY:"+mDownY+"mMoveY:"+mMoveY+"mUpY:"+mUpY+"mScaledTouchSlop:"+mScaledTouchSlop);
-//        if (condition1) {
-//            System.out.println("是上拉状态");
-//        }
+        boolean condition1 = (mDownY - mUpY) >= mTotalDragDistance;
+        Log.i("zkk","mDownY:"+mDownY+"mUpY:"+mUpY+"mScaledTouchSlop:"+mScaledTouchSlop);
+        if (condition1) {
+            System.out.println("是上拉状态");
+        }
 
         // 2. 当前页面可见的item是最后一个条目
         boolean condition2 = false;
@@ -118,7 +119,7 @@ public class SwipeRefreshView extends SwipeRefreshLayout {
         if (condition3) {
             System.out.println("不是正在加载状态");
         }
-        return /*condition1 &&*/ condition2 && condition3;
+        return condition1 && condition2 && condition3;
     }
 
     /**

@@ -180,7 +180,7 @@ public class SwipeRefreshLayout extends ViewGroup implements NestedScrollingPare
         @Override
         public void onAnimationEnd(Animation animation) {
             if (mRefreshing) {
-                // Make sure the progress view is fully visible
+                // Make sure the progress view is fully visible 确保进度视图是完全可见的
                 mProgress.setAlpha(MAX_ALPHA);
                 mProgress.start();
                 if (mNotify) {
@@ -620,6 +620,7 @@ public class SwipeRefreshLayout extends ViewGroup implements NestedScrollingPare
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        // 获取 SwipeRefreshLayout 的宽高
         final int width = getMeasuredWidth();
         final int height = getMeasuredHeight();
         if (getChildCount() == 0) {
@@ -631,14 +632,17 @@ public class SwipeRefreshLayout extends ViewGroup implements NestedScrollingPare
         if (mTarget == null) {
             return;
         }
+        // 考虑到给控件设置 padding，去除 padding 的距离
         final View child = mTarget;
         final int childLeft = getPaddingLeft();
         final int childTop = getPaddingTop();
         final int childWidth = width - getPaddingLeft() - getPaddingRight();
         final int childHeight = height - getPaddingTop() - getPaddingBottom();
+        // 设置 mTarget 的位置
         child.layout(childLeft, childTop, childLeft + childWidth, childTop + childHeight);
         int circleWidth = mCircleView.getMeasuredWidth();
         int circleHeight = mCircleView.getMeasuredHeight();
+        // 根据 mCurrentTargetOffsetTop 变量的值来设置 mCircleView 的位置
         mCircleView.layout((width / 2 - circleWidth / 2), mCurrentTargetOffsetTop,
                 (width / 2 + circleWidth / 2), mCurrentTargetOffsetTop + circleHeight);
     }
@@ -647,17 +651,21 @@ public class SwipeRefreshLayout extends ViewGroup implements NestedScrollingPare
     public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         if (mTarget == null) {
+            // 确定内部要滚动的View，如 RecycleView
             ensureTarget();
         }
         if (mTarget == null) {
             return;
         }
+        // 测量子 View （mTarget）
         mTarget.measure(MeasureSpec.makeMeasureSpec(
                 getMeasuredWidth() - getPaddingLeft() - getPaddingRight(),
                 MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(
                 getMeasuredHeight() - getPaddingTop() - getPaddingBottom(), MeasureSpec.EXACTLY));
+        // 测量刷新的圆圈 mCircleView
         mCircleView.measure(MeasureSpec.makeMeasureSpec(mCircleDiameter, MeasureSpec.EXACTLY),
                 MeasureSpec.makeMeasureSpec(mCircleDiameter, MeasureSpec.EXACTLY));
+        // 计算 mCircleView 在 ViewGroup 中的索引
         mCircleViewIndex = -1;
         // Get the index of the circleview.
         for (int index = 0; index < getChildCount(); index++) {
@@ -715,7 +723,7 @@ public class SwipeRefreshLayout extends ViewGroup implements NestedScrollingPare
 
         final int action = MotionEventCompat.getActionMasked(ev);
         int pointerIndex;
-
+        //如果当mCircleView正在返回初始位置的同时手指按下了，将标志mReturningToStart复位
         if (mReturningToStart && action == MotionEvent.ACTION_DOWN) {
             mReturningToStart = false;
         }
@@ -727,6 +735,7 @@ public class SwipeRefreshLayout extends ViewGroup implements NestedScrollingPare
         }
 
         switch (action) {
+            //手指按下时，记录按下的坐标
             case MotionEvent.ACTION_DOWN:
                 setTargetOffsetTopAndBottom(mOriginalOffsetTop - mCircleView.getTop(), true);
                 mActivePointerId = ev.getPointerId(0);
@@ -763,7 +772,7 @@ public class SwipeRefreshLayout extends ViewGroup implements NestedScrollingPare
                 mActivePointerId = INVALID_POINTER;
                 break;
         }
-
+        //如果正在被拖拽，拦截该系列的点击事件，并调用自己的onTouchEvent()来处理
         return mIsBeingDragged;
     }
 
@@ -1024,7 +1033,7 @@ public class SwipeRefreshLayout extends ViewGroup implements NestedScrollingPare
         if (mReturningToStart && action == MotionEvent.ACTION_DOWN) {
             mReturningToStart = false;
         }
-
+        //如果被禁用、CircleView正在复位、没到达顶部、mNestedScrollInProgress，直接返回，不处理该事件
         if (!isEnabled() || mReturningToStart || canChildScrollUp()
                 || mRefreshing || mNestedScrollInProgress) {
             // Fail fast if we're not in a state where a swipe is possible 如果我们不处于可能的滑动状态，则快速失败。

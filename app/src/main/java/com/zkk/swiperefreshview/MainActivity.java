@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         swipeRefreshView.setOnRefreshListener(this);
         listView = (ListView) findViewById(R.id.listView);
 
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 5; i++) {
             mData.add("这是第"+i+"条数据");
         }
 
@@ -82,13 +82,13 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 @Override
                 public void run() {
 
-                    for (int i = 0; i < 5; i++) {
+                    for (int i = 0; i < 1; i++) {
                         mData2.add("这是第"+i+"条刷新数据");
                     }
 
 
                     mData.addAll(0,mData2);
-
+                    mData2.clear();
                     mAdapter.notifyDataSetChanged();
                     swipeRefreshView.setRefreshing(false);
                 }
